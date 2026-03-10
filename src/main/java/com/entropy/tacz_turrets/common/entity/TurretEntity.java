@@ -405,7 +405,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
 
     @Override
     protected @NotNull InteractionResult mobInteract(@NotNull Player player, @NotNull InteractionHand hand) {
-        if (player.getUUID() != owner) {
+        if (!player.getUUID().equals(owner)) {
             return super.mobInteract(player, hand);
         }
         if (!getMainHandItem().isEmpty() || player.isCrouching()) {

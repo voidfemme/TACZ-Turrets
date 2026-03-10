@@ -152,7 +152,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     }
 
     public static AttributeSupplier.@NotNull Builder createLivingAttributes() {
-        return LivingEntity.createLivingAttributes().add(Attributes.FOLLOW_RANGE, 32).add(Attributes.ARMOR, 6.0D).add(Attributes.MAX_HEALTH, 200);
+        return LivingEntity.createLivingAttributes().add(Attributes.FOLLOW_RANGE, TACZTurretsConfig.turretRange).add(Attributes.ARMOR, 6.0D).add(Attributes.MAX_HEALTH, TACZTurretsConfig.turretHealth);
     }
 
     @Override

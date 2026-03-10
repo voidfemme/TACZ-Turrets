@@ -12,9 +12,14 @@ public class TACZTurretsConfig {
     private static final ForgeConfigSpec.BooleanValue CONSUME_AMMO = BUILDER
             .comment("Whether turrets need ammo")
             .define("consumeAmmo", true);
+
     private static final ForgeConfigSpec.IntValue TURRET_RANGE = BUILDER
             .comment("Turret detection and engagement range in blocks")
             .defineInRange("turretRange", 64, 8, 128);
+
+    private static final ForgeConfigSpec.IntValue TURRET_HEALTH = BUILDER
+            .comment("Initial health for new turrets. Will not affect existing turrets")
+            .defineInRange("turretHealth", 200, 10, 1000);
 
     private static final ForgeConfigSpec.BooleanValue TARGET_ALL_MOBS = BUILDER
             .comment(
@@ -25,12 +30,14 @@ public class TACZTurretsConfig {
 
     public static boolean consumeAmmo;
     public static int turretRange;
+    public static int turretHealth;
     public static boolean targetAllMobs;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
         consumeAmmo = CONSUME_AMMO.get();
         turretRange = TURRET_RANGE.get();
+        turretHealth = TURRET_HEALTH.get();
         targetAllMobs = TARGET_ALL_MOBS.get();
     }
 }

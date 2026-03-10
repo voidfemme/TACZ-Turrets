@@ -3,6 +3,7 @@ package com.entropy.tacz_turrets.common.entity;
 import com.entropy.tacz_turrets.TACZTurrets;
 import com.entropy.tacz_turrets.TACZTurretsConfig;
 import com.entropy.tacz_turrets.common.registry.ItemRegistry;
+import com.entropy.tacz_turrets.common.registry.ModTags;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ReloadState;
@@ -206,16 +207,64 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     }
 
     public BrainActivityGroup<? extends TurretEntity> getIdleTasks() {
-        return BrainActivityGroup.idleTasks(new Behavior[]{new FirstApplicableBehaviour<TurretEntity>(new TargetOrRetaliate<>(), new SetPlayerLookTarget<>(), new SetRandomLookTarget<>()), (new Idle<>()).runFor((entity) -> RandomSource.create().nextInt(30, 60))});
+        return BrainActivityGroup.idleTasks(new Behavior[] {
+                new FirstApplicableBehaviour<TurretEntity>(new TargetOrRetaliate<>(), new SetPlayerLookTarget<>(),
+                        new SetRandomLookTarget<>()),
+                (new Idle<>()).runFor((entity) -> RandomSource.create().nextInt(30, 60)) });
     }
 
     public BrainActivityGroup<? extends TurretEntity> getFightTasks() {
-        return BrainActivityGroup.fightTasks(new Behavior[]{new InvalidateAttackTarget<>(), new SetRetaliateTarget<>(), (new TaczShootAttack<>(32).startCondition((x$0) -> this.getMainHandItem().is(ModItems.MODERN_KINETIC_GUN.get()) && this.collectiveShots <= this.getStateBurst()))});
+        return BrainActivityGroup
+                .fightTasks(new Behavior[] {
+                        new InvalidateAttackTarget<>(),
+                        new SetRetaliateTarget<>(),
+                        new TaczShootAttack<>(TACZTurretsConfig.turretRange)
+                                .startCondition((x$0) -> this.getMainHandItem().is(ModItems.MODERN_KINETIC_GUN.get())
+                                        && this.collectiveShots <= this.getStateBurst()) });
     }
 
     @Override
     public List<? extends ExtendedSensor<? extends TurretEntity>> getSensors() {
-        return ObjectArrayList.of(new NearbyPlayersSensor<TurretEntity>().setPredicate((p, e) -> e.attackers.contains(p)), new HurtBySensor<>(), new NearbyLivingEntitySensor<TurretEntity>().setPredicate((target, entity) -> target == this.currentAngerTarget || target instanceof Monster || target.getType().getCategory() == MobCategory.MONSTER));
+        return ObjectArrayList.of(
+                new NearbyPlayersSensor<TurretEntity>()
+                        .setRadius(TACZTurretsConfig.turretRange)
+                        .setPredicate((p, e) -> e.attackers.contains(p)),
+                new HurtBySensor<>(),
+                new NearbyLivingEntitySensor<TurretEntity>()
+                        .setRadius(TACZTurretsConfig.turretRange)
+                        .setPredicate((target, entity) -> {
+                            if (target == entity || !target.isAlive())
+                                return false;
+                            if (target instanceof TurretEntity)
+                                return false;
+                            if (target instanceof Player)
+                                return false;
+                            if (target.getUUID().equals(entity.owner))
+                                return false;
+
+                            // Never target entities in the ignore tag
+                            if (target.getType().is(ModTags.TURRET_IGNORED))
+                                return false;
+
+                            // Direct anger target always passes
+                            if (target == entity.currentAngerTarget)
+                                return true;
+
+                            // If targetAllMobs is on, target everything that passed the above filters
+                            if (TACZTurretsConfig.targetAllMobs)
+                                return true;
+
+                            // Otherwise: vanilla monsters
+                            if (target instanceof Monster)
+                                return true;
+                            if (target.getType().getCategory() == MobCategory.MONSTER)
+                                return true;
+                            // Or entities in the turret_targets tag
+                            if (target.getType().is(ModTags.TURRET_TARGETS))
+                                return true;
+
+                            return false;
+                        }));
     }
 
     public GunTabType heldGunType() {

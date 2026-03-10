@@ -39,10 +39,12 @@ public class TaczShootAttack<E extends TurretEntity> extends ExtendedBehaviour<E
 
     @Override
     protected void start(E entity) {
-        if (this.target != null && entity.getTarget() != null && BehaviorUtils.entityIsVisible(entity.getBrain(), entity.getTarget())) {
-            entity.lookAt(EntityAnchorArgument.Anchor.EYES, entity.getTarget().getPosition(1f));
-            BehaviorUtils.lookAtEntity(entity, entity.getTarget());
-            if (entity.hasLineOfSight(entity.getTarget())) {
+        LivingEntity target = this.target;
+        if (target != null
+                && BehaviorUtils.entityIsVisible(entity.getBrain(), target)) {
+            entity.lookAt(EntityAnchorArgument.Anchor.EYES, target.getPosition(1f));
+            BehaviorUtils.lookAtEntity(entity, target);
+            if (entity.hasLineOfSight(target)) {
                 if (entity.getMainHandItem().getItem() instanceof ModernKineticGunItem) {
                     entity.aim(true);
                     ShootResult result = entity.shoot(() -> entity.getViewXRot(1f), () -> entity.getViewYRot(1f));

@@ -34,7 +34,7 @@ public class TaczShootAttack<E extends TurretEntity> extends ExtendedBehaviour<E
     @Override
     protected boolean checkExtraStartConditions(@NotNull ServerLevel level, @NotNull E entity) {
         this.target = BrainUtils.getTargetOfEntity(entity);
-        return target != null && BrainUtils.canSee(entity, this.target) && target.getUUID() != entity.owner;
+        return target != null && BrainUtils.canSee(entity, this.target) && !target.getUUID().equals(entity.owner)
     }
 
     @Override
@@ -65,7 +65,7 @@ public class TaczShootAttack<E extends TurretEntity> extends ExtendedBehaviour<E
 
     @Override
     protected void stop(E entity) {
-        //super.stop(entity);
+        // super.stop(entity);
     }
 
     @Override

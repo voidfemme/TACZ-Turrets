@@ -164,10 +164,10 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
             this.currentAngerTarget = entity;
             List<TurretEntity> entities = this.level().getEntitiesOfClass(TurretEntity.class, AABB.ofSize(this.position(), 64, 16, 64));
             List<TurretEntity> filter1 = entities.stream().filter((e) -> e.hasLineOfSight(currentAngerTarget) || BehaviorUtils.entityIsVisible(e.getBrain(), currentAngerTarget)).toList();
-            for (TurretEntity duty : filter1) {
-                duty.setTarget(currentAngerTarget);
-                duty.currentAngerTarget = entity;
-                duty.brain.setMemory(MemoryModuleType.ATTACK_TARGET, currentAngerTarget);
+            for (TurretEntity turret : filter1) {
+                turret.setTarget(currentAngerTarget);
+                turret.currentAngerTarget = entity;
+                turret.brain.setMemory(MemoryModuleType.ATTACK_TARGET, currentAngerTarget);
             }
         }
 

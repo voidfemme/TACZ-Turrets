@@ -28,10 +28,10 @@ public class TACZTurretsConfig {
 
     static final ForgeConfigSpec SPEC = BUILDER.build();
 
-    public static boolean consumeAmmo;
-    public static int turretRange;
-    public static int turretHealth;
-    public static boolean targetAllMobs;
+    public static boolean consumeAmmo = CONSUME_AMMO.getDefault();
+    public static int turretRange = TURRET_RANGE.getDefault();
+    public static int turretHealth = TURRET_HEALTH.getDefault();
+    public static boolean targetAllMobs = TARGET_ALL_MOBS.getDefault();
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {

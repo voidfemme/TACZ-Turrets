@@ -222,6 +222,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
                         new InvalidateAttackTarget<>()
                                 .invalidateIf((entity, target) -> !target.isAlive()
                                         || (target instanceof Player player && player.getAbilities().invulnerable)
+                                        || !entity.hasLineOfSight(target)
                                         || entity.distanceToSqr(target) > TACZTurretsConfig.turretRange
                                                 * TACZTurretsConfig.turretRange)
                                 .ignoreFailedPathfinding(),

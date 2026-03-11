@@ -6,6 +6,7 @@ import com.tacz.guns.item.ModernKineticGunItem;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -42,7 +43,8 @@ public class TaczShootAttack<E extends TurretEntity> extends ExtendedBehaviour<E
         LivingEntity target = this.target;
         if (target != null
                 && BehaviorUtils.entityIsVisible(entity.getBrain(), target)) {
-            entity.lookAt(EntityAnchorArgument.Anchor.EYES, target.getPosition(1f));
+            Vec3 center = target.getBoundingBox().getCenter();
+            entity.lookAt(EntityAnchorArgument.Anchor.EYES, center);
             BehaviorUtils.lookAtEntity(entity, target);
             if (entity.hasLineOfSight(target)) {
                 if (entity.getMainHandItem().getItem() instanceof ModernKineticGunItem) {

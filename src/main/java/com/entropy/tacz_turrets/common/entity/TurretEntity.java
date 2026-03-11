@@ -41,6 +41,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.behavior.Behavior;
 import net.minecraft.world.entity.ai.behavior.BehaviorUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.ai.memory.NearestVisibleLivingEntities;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -65,6 +66,8 @@ import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyPlayersSensor;
+import net.tslat.smartbrainlib.util.BrainUtils;
+
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Unique;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -216,7 +219,13 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     public BrainActivityGroup<? extends TurretEntity> getFightTasks() {
         return BrainActivityGroup
                 .fightTasks(new Behavior[] {
-                        new InvalidateAttackTarget<>(),
+                        new InvalidateAttackTarget<>()
+                                .invalidateIf((entity, target) -> !target.isAlive()
+                                        || (target instanceof Player player && player.getAbilities().invulnerable)
+                                        || !entity.hasLineOfSight(target)
+                                        || entity.distanceToSqr(target) > TACZTurretsConfig.turretRange
+                                                * TACZTurretsConfig.turretRange)
+                                .ignoreFailedPathfinding(),
                         new SetRetaliateTarget<>(),
                         new TaczShootAttack<>(TACZTurretsConfig.turretRange)
                                 .startCondition((x$0) -> this.getMainHandItem().is(ModItems.MODERN_KINETIC_GUN.get())
@@ -225,13 +234,14 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
 
     @Override
     public List<? extends ExtendedSensor<? extends TurretEntity>> getSensors() {
+        int range = TACZTurretsConfig.turretRange > 0 ? TACZTurretsConfig.turretRange : 64;
         return ObjectArrayList.of(
                 new NearbyPlayersSensor<TurretEntity>()
-                        .setRadius(TACZTurretsConfig.turretRange)
+                        .setRadius(range)
                         .setPredicate((p, e) -> e.attackers.contains(p)),
                 new HurtBySensor<>(),
                 new NearbyLivingEntitySensor<TurretEntity>()
-                        .setRadius(TACZTurretsConfig.turretRange)
+                        .setRadius(range)
                         .setPredicate((target, entity) -> {
                             if (target == entity || !target.isAlive())
                                 return false;

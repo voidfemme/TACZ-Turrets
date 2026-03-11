@@ -7,6 +7,11 @@ Ever wanted a good turret mod, but you couldn't find any? Ever wanted one that i
 
 This mod adds turrets that use guns from TACZ. Simply click it with a gun, or drop it near the turret. Clicking a turret that has a gun will take the gun and ammo. The turret has a light on both sides, if it's green then it's good to go, yellow means reloading, bright red is out of ammo and dark red means no gun equipped.
 
-The config currently has one value that controls whether turrets require ammo. If it's off, then it can fire indefinitely. If it is on, the turret will need the correct type of ammo for the gun. This can be provided either by clicking it, dropping the ammo near it, or putting the ammo in a chest directly under the turret.
+The config has the following options:
+
+- **consumeAmmo** — Whether turrets require ammo. If off, turrets fire indefinitely. If on, the turret needs the correct ammo type for its gun, which can be provided by clicking the turret, dropping ammo near it, or placing it in a chest directly under the turret.
+- **turretRange** — Detection and engagement range in blocks (default 64, min 8, max 128).
+- **turretHealth** — Initial health for newly placed turrets (default 200, min 10, max 1000). Does not affect existing turrets.
+- **targetAllMobs** — If true, turrets target all living entities except players, other turrets, and the owner. If false, turrets only target vanilla monsters and entities added to the `tacz_turrets:turret_targets` entity type tag. Entities in the `tacz_turrets:turret_ignored` tag are never targeted regardless of this setting.
 
 Based off of the [TACZ NPCS](https://modrinth.com/mod/tacz-npcs) mod, borrows lots of code from it. Huge thanks to Corrinedev for making an open-source mod!

@@ -1,0 +1,44 @@
+package com.entropy.tacz_turrets.util;
+
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+import org.jetbrains.annotations.NotNull;
+
+public interface HasSimpleInventory extends IItemHandler, ICapabilityProvider {
+    ItemStackHandler getInventory();
+
+    @Override
+    default int getSlots() {
+        return getInventory().getSlots();
+    }
+
+    @Override
+    @NotNull
+    default ItemStack getStackInSlot(int slot) {
+        return getInventory().getStackInSlot(slot);
+    }
+
+    @Override
+    @NotNull
+    default ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+        return getInventory().insertItem(slot, stack, simulate);
+    }
+
+    @Override
+    @NotNull
+    default ItemStack extractItem(int slot, int amount, boolean simulate) {
+        return getInventory().extractItem(slot, amount, simulate);
+    }
+
+    @Override
+    default int getSlotLimit(int slot) {
+        return getInventory().getSlotLimit(slot);
+    }
+
+    @Override
+    default boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        return getInventory().isItemValid(slot, stack);
+    }
+}

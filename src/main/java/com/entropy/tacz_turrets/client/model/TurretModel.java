@@ -1,7 +1,7 @@
-package com.entropy.tacz_turrets.client.renderer;
+package com.entropy.tacz_turrets.client.model;
 
 import com.entropy.tacz_turrets.TACZTurrets;
-import com.entropy.tacz_turrets.common.entity.TurretEntity;
+import com.entropy.tacz_turrets.entity.TurretEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import software.bernie.geckolib.constant.DataTickets;
@@ -13,7 +13,7 @@ import software.bernie.geckolib.model.data.EntityModelData;
 public class TurretModel extends GeoModel<TurretEntity> {
     @Override
     public ResourceLocation getModelResource(TurretEntity turretEntity) {
-        return new ResourceLocation(TACZTurrets.MODID, "geo/entity/turret.geo.json");
+        return TACZTurrets.id("geo/entity/turret.geo.json");
     }
 
     @Override
@@ -23,7 +23,7 @@ public class TurretModel extends GeoModel<TurretEntity> {
 
     @Override
     public ResourceLocation getAnimationResource(TurretEntity turretEntity) {
-        return new ResourceLocation(TACZTurrets.MODID, "animations/entity/turret.animation.json");
+        return TACZTurrets.id("animations/entity/turret.animation.json");
     }
 
     @Override

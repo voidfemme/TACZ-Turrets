@@ -1,10 +1,12 @@
 package com.entropy.tacz_turrets;
 
-import com.entropy.tacz_turrets.common.registry.AttributeRegistry;
-import com.entropy.tacz_turrets.common.registry.EntityTypeRegistry;
-import com.entropy.tacz_turrets.common.registry.ItemRegistry;
+import com.entropy.tacz_turrets.registry.AttributeRegistry;
+import com.entropy.tacz_turrets.registry.EntityTypeRegistry;
+import com.entropy.tacz_turrets.registry.ItemRegistry;
+import com.entropy.tacz_turrets.config.TACZTurretsConfig;
 import com.mojang.logging.LogUtils;
 import com.tacz.guns.init.ModCreativeTabs;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -32,5 +34,9 @@ public class TACZTurrets {
 
     public void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == ModCreativeTabs.OTHER_TAB.getKey()) event.accept(ItemRegistry.TURRET.get());
+    }
+
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 }

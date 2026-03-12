@@ -1,7 +1,7 @@
 package com.entropy.tacz_turrets.client;
 
 import com.entropy.tacz_turrets.client.renderer.TurretRenderer;
-import com.entropy.tacz_turrets.common.registry.EntityTypeRegistry;
+import com.entropy.tacz_turrets.registry.EntityTypeRegistry;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

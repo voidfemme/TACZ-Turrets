@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.entropy.tacz_turrets.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "mixins.tacz_turrets.refmap.json",
+  "mixins": [
+    "AmmoCheckMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

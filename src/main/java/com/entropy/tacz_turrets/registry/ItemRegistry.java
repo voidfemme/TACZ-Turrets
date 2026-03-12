@@ -1,6 +1,6 @@
-package com.entropy.tacz_turrets.common.registry;
+package com.entropy.tacz_turrets.registry;
 
-import com.entropy.tacz_turrets.TurretItem;
+import com.entropy.tacz_turrets.item.TurretItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;

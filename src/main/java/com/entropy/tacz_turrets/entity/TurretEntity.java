@@ -76,7 +76,7 @@ import java.util.UUID;
 public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, HasSimpleInventory, GeoEntity {
     public static final EntityType<TurretEntity> TYPE = EntityType.Builder.<TurretEntity>of(TurretEntity::new, MobCategory.MISC).sized(1f, 1f).build("turret");
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-    private final IGunOperator gunOperator = IGunOperator.fromLivingEntity(this);
+    private final IGunOperator gunOperator = IGunOperator.fromLivingEntity(this); //LivingEntity is already a gun operator, implementing it here would just be redundant. However, the IDE does not recognize it because it's implemented through a mixin, so this is a small workaround.
 
     private static final UniformInt ALERT_INTERVAL = TimeUtil.rangeOfSeconds(4, 6);
     private boolean gunDrawn = false;
@@ -100,7 +100,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define(stateName, "No Gun");
+        entityData.define(stateName, TurretState.NO_GUN.name);
     }
 
     @Override
@@ -155,15 +155,16 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
         return hasGun() && (getGunItem().getCurrentAmmoCount(getGunStack()) > 0);
     }
 
-    public ShootResult shoot() {
-        return gunOperator.shoot(() -> getViewXRot(1), () -> getViewYRot(1));
-    }
-
     public boolean isRightAmmo(ItemStack stack) {
         return hasGun() && stack.getItem() instanceof IAmmo ammo && ammo.isAmmoOfGun(getGunStack(), stack);
     }
 
+    public boolean isEnabled() {
+        return TurretState.getState(this) != TurretState.DISABLED;
+    }
+
     public void tryShoot() {
+        if (!isEnabled()) return;
         gunOperator.aim(true);
         ShootResult result = shoot();
         switch (result) {
@@ -172,6 +173,10 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
             case NOT_DRAW -> gunOperator.draw(this::getGunStack);
         }
         if (TACZTurretsConfig.logTurretShootResults) TACZTurrets.LOGGER.info("Turret shoot result {}", result);
+    }
+
+    private ShootResult shoot() {
+        return gunOperator.shoot(() -> getViewXRot(1), () -> getViewYRot(1));
     }
 
     public boolean hasAmmo() {
@@ -186,7 +191,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     }
 
     public void collectAmmo() {
-        if (TACZTurretsConfig.consumeAmmo) {
+        if (TACZTurretsConfig.consumeAmmo && isEnabled()) {
             BlockEntity blockEntity = level().getBlockEntity(blockPosition()) == null ? level().getBlockEntity(blockPosition().below()) : level().getBlockEntity(blockPosition());
             if (blockEntity != null) {
                 blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
@@ -207,7 +212,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     }
 
     public void pickUpItem(@NotNull ItemEntity itemEntity) {
-        if (!isDeadOrDying()) {
+        if (!isDeadOrDying() && isEnabled()) {
             ItemStack itemStack = itemEntity.getItem();
             if (wantsToPickUp(itemStack)) {
                 if (itemStack.getItem() instanceof ModernKineticGunItem) {
@@ -222,7 +227,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
                         if (getStackInSlot(slot).isEmpty() || (getStackInSlot(slot).is(itemStack.getItem()))) {
                             onItemPickup(itemEntity);
                             int count = Math.min(itemStack.getCount(), getStackInSlot(slot).getMaxStackSize() - getStackInSlot(slot).getCount());
-                            inventory.setStackInSlot(slot, itemStack.copyWithCount(count + getStackInSlot(slot).getCount()));
+                            setStackInSlot(slot, itemStack.copyWithCount(count + getStackInSlot(slot).getCount()));
                             if (count >= itemStack.getCount()) {
                                 take(itemEntity, count);
                                 itemEntity.discard();
@@ -263,37 +268,41 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
 
     private void onTickServerSide() {
         if (!level().isClientSide()) {
-            if (hasGun()) {
-                ModernKineticGunItem gun = getGunItem();
-                if (!gunDrawn) {
-                    gunOperator.draw(this::getMainHandItem);
-                    gunDrawn = true;
-                }
-                ItemStack gunItem = getMainHandItem();
-                ResourceLocation gunId = gun.getGunId(gunItem);
-                IGun iGun = IGun.getIGunOrNull(gunItem);
-                if (iGun != null) {
-                    Optional<CommonGunIndex> gunIndexOptional = TimelessAPI.getCommonGunIndex(gunId);
-                    if (gunIndexOptional.isPresent()) {
-                        CommonGunIndex gunIndex = gunIndexOptional.get();
-                        GunData gunData = gunIndex.getGunData();
-                        AttachmentCacheProperty property = new AttachmentCacheProperty();
-                        property.eval(getMainHandItem(), gunData);
+            if (isEnabled()) {
+                if (hasGun()) {
+                    ModernKineticGunItem gun = getGunItem();
+                    if (!gunDrawn) {
+                        gunOperator.draw(this::getGunStack);
+                        gunDrawn = true;
                     }
-                }
+                    ItemStack gunItem = getGunStack();
+                    ResourceLocation gunId = gun.getGunId(gunItem);
+                    IGun iGun = IGun.getIGunOrNull(gunItem);
+                    if (iGun != null) {
+                        Optional<CommonGunIndex> gunIndexOptional = TimelessAPI.getCommonGunIndex(gunId);
+                        if (gunIndexOptional.isPresent()) {
+                            CommonGunIndex gunIndex = gunIndexOptional.get();
+                            GunData gunData = gunIndex.getGunData();
+                            AttachmentCacheProperty property = new AttachmentCacheProperty();
+                            property.eval(getMainHandItem(), gunData);
+                        }
+                    }
 
-                if (gunOperator.getSynReloadState().getStateType().isReloading()) {
-                    TurretState.RELOADING.setState(this);
-                } else {
-                    if (hasAmmo()) {
-                        TurretState.ACTIVE.setState(this);
-                    } else {
-                        TurretState.NO_AMMO.setState(this);
-                        collectAmmo();
+                    if (isEnabled()) {
+                        if (gunOperator.getSynReloadState().getStateType().isReloading()) {
+                            TurretState.RELOADING.setState(this);
+                        } else {
+                            if (hasAmmo()) {
+                                TurretState.ACTIVE.setState(this);
+                            } else {
+                                TurretState.NO_AMMO.setState(this);
+                                collectAmmo();
+                            }
+                        }
                     }
+                } else {
+                    TurretState.NO_GUN.setState(this);
                 }
-            } else {
-                TurretState.NO_GUN.setState(this);
             }
         }
     }
@@ -364,6 +373,8 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     }
 
     public void setTarget(@Nullable LivingEntity entity) {
+        if (!isEnabled()) return;
+
         if (getTarget() == null && entity != null) {
             ALERT_INTERVAL.sample(random);
         }
@@ -404,10 +415,11 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     }
 
     private boolean shouldTarget(LivingEntity target) {
+        if (!isEnabled()) return false;
         if (target == this || !target.isAlive()) return false;
         if (target instanceof TurretEntity) return false;
-        if (target instanceof Player) return false;
         if (target.getUUID().equals(owner)) return false;
+        if (target instanceof Player) return target.equals(lastHurtByPlayer);
 
         // Never target entities in the ignore tag
         if (target.getType().is(TagRegistry.TURRET_IGNORED)) return false;
@@ -465,7 +477,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     }
 
     public enum TurretState {
-        ACTIVE("Active"), RELOADING("Reloading"), NO_AMMO("No Ammo"), NO_GUN("No Gun");
+        ACTIVE("Active"), RELOADING("Reloading"), NO_AMMO("No Ammo"), NO_GUN("No Gun"), DISABLED("Disabled");
 
         private final String name;
         private final String texture;

@@ -1,8 +1,8 @@
 package com.entropy.tacz_turrets.client.model;
 
 import com.entropy.tacz_turrets.TACZTurrets;
-import com.entropy.tacz_turrets.item.TurretItem;
 import com.entropy.tacz_turrets.entity.TurretEntity;
+import com.entropy.tacz_turrets.item.TurretItem;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 

@@ -9,6 +9,10 @@ import org.jetbrains.annotations.NotNull;
 public interface HasSimpleInventory extends IItemHandler, ICapabilityProvider {
     ItemStackHandler getInventory();
 
+    default void setStackInSlot(int slot, ItemStack stack) {
+        getInventory().setStackInSlot(slot, stack);
+    }
+
     @Override
     default int getSlots() {
         return getInventory().getSlots();

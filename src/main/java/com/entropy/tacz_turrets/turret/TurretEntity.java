@@ -5,7 +5,7 @@ import com.entropy.tacz_turrets.config.TACZTurretsConfig;
 import com.entropy.tacz_turrets.registry.ItemRegistry;
 import com.entropy.tacz_turrets.registry.TagRegistry;
 import com.entropy.tacz_turrets.turret.ai.TaczShootAttack;
-import com.entropy.tacz_turrets.util.HasSimpleInventory;
+import com.entropy.tacz_turrets.util.HasTurretInventory;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
@@ -69,7 +69,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, HasSimpleInventory, GeoEntity {
+public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, HasTurretInventory, GeoEntity {
     public static final EntityType<TurretEntity> TYPE = EntityType.Builder.<TurretEntity>of(TurretEntity::new, MobCategory.MISC).sized(1f, 1f).build("turret");
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private final IGunOperator gunOperator = IGunOperator.fromLivingEntity(this); //LivingEntity is already a gun operator, implementing it here would just be redundant. However, the IDE does not recognize it because it's implemented through a mixin, so this is a small workaround.
@@ -483,6 +483,4 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     public boolean ignoreExplosion() {
         return true;
     }
-
-
 }

@@ -6,7 +6,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
-public interface HasSimpleInventory extends IItemHandler, ICapabilityProvider {
+public interface HasTurretInventory extends IItemHandler, ICapabilityProvider {
     ItemStackHandler getInventory();
 
     default void setStackInSlot(int slot, ItemStack stack) {

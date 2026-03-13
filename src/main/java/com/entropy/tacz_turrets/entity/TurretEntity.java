@@ -317,7 +317,9 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
             setGunStack(ItemStack.EMPTY);
             for (int slot = 0; slot < getSlots(); slot++) {
                 if (!getStackInSlot(slot).isEmpty()) {
-                    player.getInventory().add(extractItem(slot, getStackInSlot(slot).getCount(), false));
+                    if (!player.getInventory().add(extractItem(slot, getStackInSlot(slot).getCount(), false))) {
+                        spawnAtLocation(extractItem(slot, getStackInSlot(slot).getCount(), false));
+                    }
                 }
             }
             if (player.isCrouching()) {

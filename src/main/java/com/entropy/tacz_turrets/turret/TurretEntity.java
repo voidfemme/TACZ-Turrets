@@ -380,6 +380,11 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
         return super.isInvulnerableTo(source);
     }
 
+    @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
     public void setTarget(@Nullable LivingEntity entity) {
         if (!isEnabled()) return;
 

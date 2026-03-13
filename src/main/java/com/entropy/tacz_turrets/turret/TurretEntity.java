@@ -1,10 +1,10 @@
-package com.entropy.tacz_turrets.entity;
+package com.entropy.tacz_turrets.turret;
 
 import com.entropy.tacz_turrets.TACZTurrets;
 import com.entropy.tacz_turrets.config.TACZTurretsConfig;
-import com.entropy.tacz_turrets.entity.ai.TaczShootAttack;
 import com.entropy.tacz_turrets.registry.ItemRegistry;
 import com.entropy.tacz_turrets.registry.TagRegistry;
+import com.entropy.tacz_turrets.turret.ai.TaczShootAttack;
 import com.entropy.tacz_turrets.util.HasSimpleInventory;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
@@ -21,9 +21,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.RandomSource;
@@ -69,7 +66,6 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -80,11 +76,10 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
 
     private static final UniformInt ALERT_INTERVAL = TimeUtil.rangeOfSeconds(4, 6);
     private boolean gunDrawn = false;
-
+    private TurretEnableType enableType = TurretEnableType.ALWAYS_ON;
     private final ItemStackHandler inventory = new ItemStackHandler(5);
     private final LazyOptional<ItemStackHandler> lazyInventory = LazyOptional.of(() -> inventory);
     public UUID owner;
-    public static final EntityDataAccessor<String> stateName = SynchedEntityData.defineId(TurretEntity.class, EntityDataSerializers.STRING);
 
     public TurretEntity(Level level, BlockPos pos, Player player) {
         this(TYPE, level);
@@ -100,7 +95,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        entityData.define(stateName, TurretState.NO_GUN.name);
+        entityData.define(TurretState.stateName, TurretState.NO_GUN.name);
     }
 
     @Override
@@ -126,6 +121,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
         super.addAdditionalSaveData(tag);
         tag.put("Inventory", inventory.serializeNBT());
         tag.putUUID("Owner", owner);
+        tag.putString("EnableType", enableType.name());
     }
 
     @Override
@@ -133,6 +129,7 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
         super.readAdditionalSaveData(tag);
         inventory.deserializeNBT(tag.getCompound("Inventory"));
         owner = tag.getUUID("Owner");
+        enableType = TurretEnableType.valueOf(tag.getString("EnableType"));
     }
 
     public ItemStack getGunStack() {
@@ -303,8 +300,17 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
                 } else {
                     TurretState.NO_GUN.setState(this);
                 }
+                if (shouldDisable()) {
+                    TurretState.DISABLED.setState(this);
+                }
+            } else if (!shouldDisable()) {
+                TurretState.NO_GUN.setState(this);
             }
         }
+    }
+
+    private boolean shouldDisable() {
+        return enableType.shouldDisable(level(), blockPosition());
     }
 
     @Override
@@ -478,30 +484,5 @@ public class TurretEntity extends Mob implements SmartBrainOwner<TurretEntity>, 
         return true;
     }
 
-    public enum TurretState {
-        ACTIVE("Active"), RELOADING("Reloading"), NO_AMMO("No Ammo"), NO_GUN("No Gun"), DISABLED("Disabled");
 
-        private final String name;
-        private final String texture;
-
-        TurretState(String name) {
-            this.name = name;
-            texture = name.toLowerCase(Locale.ROOT).replaceAll(" ", "_");
-        }
-
-        public void setState(TurretEntity turret) {
-            turret.entityData.set(stateName, name);
-        }
-
-        public ResourceLocation getPath() {
-            return TACZTurrets.id("textures/entity/turret_" + texture + ".png");
-        }
-
-        public static TurretState getState(TurretEntity turret) {
-            for (TurretState state : values()) {
-                if (turret.getEntityData().get(stateName).equals(state.name)) return state;
-            }
-            return NO_GUN;
-        }
-    }
 }

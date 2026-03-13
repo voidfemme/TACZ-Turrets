@@ -1,7 +1,8 @@
 package com.entropy.tacz_turrets.client.model;
 
 import com.entropy.tacz_turrets.TACZTurrets;
-import com.entropy.tacz_turrets.entity.TurretEntity;
+import com.entropy.tacz_turrets.turret.TurretEntity;
+import com.entropy.tacz_turrets.turret.TurretState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import software.bernie.geckolib.constant.DataTickets;
@@ -18,7 +19,7 @@ public class TurretModel extends GeoModel<TurretEntity> {
 
     @Override
     public ResourceLocation getTextureResource(TurretEntity animatable) {
-        return TurretEntity.TurretState.getState(animatable).getPath();
+        return TurretState.getState(animatable).getPath();
     }
 
     @Override

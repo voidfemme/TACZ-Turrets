@@ -1,7 +1,7 @@
 package com.entropy.tacz_turrets.client.renderer;
 
 import com.entropy.tacz_turrets.client.model.TurretModel;
-import com.entropy.tacz_turrets.entity.TurretEntity;
+import com.entropy.tacz_turrets.turret.TurretEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;

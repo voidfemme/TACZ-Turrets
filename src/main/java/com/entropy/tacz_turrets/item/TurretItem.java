@@ -1,7 +1,7 @@
 package com.entropy.tacz_turrets.item;
 
 import com.entropy.tacz_turrets.client.renderer.TurretItemRenderer;
-import com.entropy.tacz_turrets.entity.TurretEntity;
+import com.entropy.tacz_turrets.turret.TurretEntity;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;

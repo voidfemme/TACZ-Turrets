@@ -1,6 +1,6 @@
 package com.entropy.tacz_turrets.registry;
 
-import com.entropy.tacz_turrets.entity.TurretEntity;
+import com.entropy.tacz_turrets.turret.TurretEntity;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

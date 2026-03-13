@@ -1,6 +1,6 @@
-package com.entropy.tacz_turrets.entity.ai;
+package com.entropy.tacz_turrets.turret.ai;
 
-import com.entropy.tacz_turrets.entity.TurretEntity;
+import com.entropy.tacz_turrets.turret.TurretEntity;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -32,14 +32,14 @@ public class TaczShootAttack<E extends TurretEntity> extends ExtendedBehaviour<E
     }
 
     @Override
-    protected boolean checkExtraStartConditions(@NotNull ServerLevel level, @NotNull E entity) {
-        target = BrainUtils.getTargetOfEntity(entity);
-        return target != null && BrainUtils.canSee(entity, target) && !target.getUUID().equals(entity.owner);
+    protected boolean checkExtraStartConditions(@NotNull ServerLevel level, @NotNull E turret) {
+        target = BrainUtils.getTargetOfEntity(turret);
+        return turret.isEnabled() && target != null && BrainUtils.canSee(turret, target) && !target.getUUID().equals(turret.owner);
     }
 
     @Override
     protected void start(E turret) {
-        if (target != null && BehaviorUtils.entityIsVisible(turret.getBrain(), target)) {
+        if (turret.isEnabled() && target != null && BehaviorUtils.entityIsVisible(turret.getBrain(), target)) {
             Vec3 eyePos = target.getEyePosition();
             turret.lookAt(EntityAnchorArgument.Anchor.EYES, eyePos);
             BehaviorUtils.lookAtEntity(turret, target);

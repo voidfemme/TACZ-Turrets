@@ -1,7 +1,7 @@
 package com.entropy.tacz_turrets.mixin;
 
 import com.entropy.tacz_turrets.config.TACZTurretsConfig;
-import com.entropy.tacz_turrets.entity.TurretEntity;
+import com.entropy.tacz_turrets.turret.TurretEntity;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.tacz.guns.entity.shooter.LivingEntityAmmoCheck;
 import net.minecraft.world.entity.LivingEntity;
